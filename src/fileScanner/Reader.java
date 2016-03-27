@@ -22,37 +22,43 @@ public class Reader extends JPanel{
 	private String word;
 	private StringTokenizer st;
 	private JLabel label;
+	private File file;
 	
-	public String replace(String str, int index, char replace){     
-	    if(str==null){
-	        return str;
-	    }else if(index<0 || index>=str.length()){
-	        return str;
-	    }
-	    char[] chars = str.toCharArray();
-	    chars[index] = replace;
-	    return String.valueOf(chars);       
-	}
 	
 	public Reader() {
-		setLayout(new FlowLayout());
 		
-		JLabel lbl = new JLabel("Enter the text/phrase: ");
-		add(lbl);
+		setLayout(new BorderLayout());
+		
+		JPanel panel1 = new JPanel();
+		panel1.setLayout(new FlowLayout());
+		add(panel1, BorderLayout.NORTH);
+		
+		JLabel lb1 = new JLabel("Enter the text/phrase: ");
+		panel1.add(lb1);
 		
 		tf = new JTextField("", 10);
-		add(tf);
+		panel1.add(tf);
+		
+		JPanel panel2 = new JPanel();
+		panel2.setLayout(new GridLayout(1, 4));
+		add(panel2, BorderLayout.SOUTH);
+		
+		JButton choose = new JButton("Choose File");
+		choose.addActionListener(new Listener3());
+		panel2.add(choose);
+		
+		panel2.add(new JLabel(""));
+	//	panel2.add(new JLabel(""));
+	//	panel2.add(new JLabel(""));
 		
 		JButton find = new JButton("Find");
-		find.addActionListener(new Listener1());
-		add(find);
+		find.addActionListener(new Listener1());;
+		panel2.add(find);
 		
 		JButton clear = new JButton("Clear");
 		clear.addActionListener(new Listener2());
-		add(clear);
-		
-		label = new JLabel("");
-		add(label);
+		panel2.add(clear);
+
 		
 	}
 	
@@ -62,21 +68,17 @@ public class Reader extends JPanel{
 			String[] word;
 			BufferedReader br = null;
 			
-	    	File file = new File("example.txt");
+	    	//File file = new File("example.txt");
 	    		
 	    	try {
 	    		
 				FileReader fr = new FileReader(file);
 				br = new BufferedReader(fr);
 				
-				
-				
-//				for(int i = 0; i < line.length(); i++) {
-//					index[i] = word[i].indexOf(",");
-//					System.out.println(index[i]);
-//				}
+				final TextCleaner tc = new TextCleaner();
 				String line;
 				while((line = br.readLine()) != null) {
+					line = tc.clean(line);
 					word = line.split(" ");
 					int count = 0;
 					for(int i = 0; i < word.length; i++) {
@@ -86,7 +88,7 @@ public class Reader extends JPanel{
 						}
 					}
 					label.setText("There are " + count + " occurance(s) of the word " + 
-					tf.getText() + " in " + file.toString());
+					tf.getText());
 				}
 	    	} catch (IOException e1) {
 	    	    System.out.println("A problem occurred.");
@@ -95,7 +97,6 @@ public class Reader extends JPanel{
 	    	try {
 				br.close();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				System.out.println("Cannot close the file");
 			}
 		}
@@ -106,6 +107,18 @@ public class Reader extends JPanel{
 			tf.setText("");
 			label.setText("");
 			
+		}
+	}
+	
+	public class Listener3 implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			final JFileChooser fc = new JFileChooser();
+			
+			int returnVal = fc.showOpenDialog(fc);
+			
+			if(returnVal == JFileChooser.APPROVE_OPTION) {
+				file = fc.getSelectedFile();
+			}
 		}
 	}
 }
